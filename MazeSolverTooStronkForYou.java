@@ -9,242 +9,159 @@ import java.util.*;
  * @author Nitin Armstrong (The one and Only) 
  * @version 4.20
  */
-public class MazeSolverTooStronkForYou
-{
-    public Stack<movementTings> newMaze  = new Stack<>(); //movement controls for solving the og maze and then is reffered as new maze for mod. purposes
-    public ArrayList<String> mazeList = new ArrayList<>(); //im special and only real hype beasts use char, scan the whole maze into an array list
-    public ArrayList<movementTings> ogMaze = new ArrayList(); // used for scanning and size tings
-    public int down; //relative integers used for maze state manipulation
-    public int left;
-    /**
-     * Starts the whole jaun by using the constructor 
-     */
+public class MazeSolver
+{  
+    //define variables used in program
+    static Node newx = new Node(0);
+    static Node newy = new Node(0);
+
+    static int i;
+    static int x;
+    static int counter;
+    static int xAxis;
+    static String store;
+    static String [] mazePositions; //decided to not follow tom and just use a string Array
+
     public static void main (String [] args) {
-        new MazeSolverTooStronkForYou();
-    }
+        try{            
+            Scanner scan;
+            scan = new Scanner(new BufferedReader(new FileReader("maze.txt")));
 
-    /**
-     * Array lists arent static and the whole advantage of them is that they are fluid like my homie.
-     * Creating a method that isnt static makes this possible and allows arraylists (way that i learned from tom is to make the process continous instead of static like an array)
-     */
-    public void MazeSolverTooStronkForYou() {
-        for(int a = 0; a < mazeList.size(); a++){ //sets upper limit of the maze size
-            for(int b = 0; b < mazeList.get(a).length(); b++){ //loop condition that b must keep going until it is equal to a
-                if(mazeList.get(a).substring(b, b+1).equals("@")){
-                    newMaze.push(new movementTings(a,b)); //finds the start and does the pushy tings
-                }
-            }
-        }
-        if(newMaze.peek() == null){
-            System.out.println("Kramer, why tf does the maze not have a start");
-        }    
-        else{
-            try{
-                while(!(mazeList.get(newMaze.peek().getYLocation()).substring(newMaze.peek().getXLocation(), newMaze.peek().getXLocation() + 1).equals("$"))){
-                    pathSolver();
-                }
-            }
-            catch(NullPointerException iCanDoCustomExceptionNames){
-                System.out.println("Kramer, why tf is the maze unsolvable" + "\n" +iCanDoCustomExceptionNames);
-            }  
-        }
+            //variables for xAxis and counter
+            counter = 0;
+            xAxis = 0;
 
-        Stack<MazeLocation> temp = new Stack<>(); //the idea here is to have a temp stack to allow me to use pop and print to print the array (cont)
-        //prints in reverse order (rememeber FILO?)
-        while(maze.peek() != null){
-            temp.push(newMaze.pop()); 
-        }
-        int x = 0;
-        while(temp.peek() != null){
-            System.out.println("Step ", x, temp.peek().getyLocation(), temp.peek().getxLocation());
-            temp.pop();
-            x++; //step counter variable
-        }  
-        //         try{
-        //             Scanner scan = new Scanner( new BufferedReader( new FileReader("maze.txt")));
-        //             while(scan.hasNext()){
-        //                 mazeList.add(scan.next());
-        //             }
-        //             scan.close();
-        //         }
-        //         catch(Exception e){
-        //             System.out.println(e);
-        //         }    
-    }    
+            //as it reads from file, xAxis number will keep increasing
+            while (scan.hasNextLine()){
+                xAxis++;
+                scan.next();
+            }   
 
-    //     /**
-    //      * an easier way to print out my cheeky message that something is wrong
-    //      */
-    //     public static void shitDontWork(){
-    //         System.out.println("Kramer, why tf does something here doesnt work");
-    // 
-    //     }
-
-    /**
-     * The actual logic behind the maze (backtracking, and a hell of a lot of if statements)
-     * the "return;" means that it spits out the location of the correct solution
-     */
-    public static void pathSolver () {
-        if(down == 0 && left == 0){
-            if((mazeList.get(down + 1).substring(left, left + 1).equals(".")) || mazeList.get(down + 1).substring(left, left + 1).equals("$")){
-                if(move(down + 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left + 1, left + 2).equals(".")) || mazeList.get(down).substring(left + 1, left + 2).equals("$")){
-                if(move(down, left + 1)){
-                    return;}
-            } 
-        }
-        //Top Right Corner
-        else if(down == 0 && left == mazeList.get(down).length() - 1){
-            if((mazeList.get(down + 1).substring(left, left + 1).equals(".")) || mazeList.get(down + 1).substring(left, left + 1).equals("$")){
-                if(move(down + 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left - 1, left).equals(".")) || mazeList.get(down).substring(left - 1, left).equals("$")){
-                if(move(down, left - 1)){
-                    return;}
-            } 
-        }
-        //Bottom Left Corner
-        else if(down == mazeList.size() - 1 && left == 0){
-            if((mazeList.get(down - 1).substring(left, left + 1).equals(".")) || mazeList.get(down - 1).substring(left, left + 1).equals("$")){
-                if(move(down - 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left + 1, left + 2).equals(".")) || mazeList.get(down).substring(left + 1, left + 2).equals("$")){
-                if(move(down, left + 1)){
-                    return;}
-            } 
-        }
-        //Bottom Right conrner
-        else if(down == mazeList.size() - 1 && left == mazeList.get(down).length() - 1){
-            if((mazeList.get(down - 1).substring(left, left + 1).equals(".")) || mazeList.get(down - 1).substring(left, left + 1).equals("$")){
-                if(move(down - 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left - 1, left).equals(".")) || mazeList.get(down).substring(left - 1, left).equals("$")){
-                if(move(down, left - 1)){
-                    return;}
-            } 
-        }    
-        //top row
-        else if(down == 0  && left > 0){
-            if((mazeList.get(down + 1).substring(left, left + 1).equals(".")) || mazeList.get(down + 1).substring(left, left + 1).equals("$")){
-                if(move(down + 1, left)){
-                    return;}
-            }
-            if((mazeList.get(down).substring(left - 1, left).equals(".")) || mazeList.get(down).substring(left - 1, left).equals("$")){                    
-                if(move(down, left - 1)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left + 1, left + 2).equals(".")) || mazeList.get(down).substring(left + 1, left + 2).equals("$")){
-                if(move(down, left + 1)){
-                    return;}
-            }
-        }
-        //Bottom row
-        else if( down == mazeList.size() - 1 && left > 0){
-            if((mazeList.get(down - 1).substring(left, left + 1).equals(".")) || mazeList.get(down - 1).substring(left, left + 1).equals("$")){
-                if(move(down - 1, left)){
-                    return;}
-            }
-            if((mazeList.get(down).substring(left - 1, left).equals(".")) || mazeList.get(down).substring(left - 1, left).equals("$")){
-                if(move(down, left - 1)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left + 1, left + 2).equals(".")) || mazeList.get(down).substring(left + 1, left + 2).equals("$")){
-                if(move(down, left + 1)){
-                    return;}
-            }
-        }
-        //Left row
-        else if( left == 0 && down > 0){
-            if((mazeList.get(down - 1).substring(left, left + 1).equals(".")) || mazeList.get(down - 1).substring(left, left + 1).equals("$")){
-                if(move(down - 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down + 1).substring(left, left + 1).equals(".")) || mazeList.get(down + 1).substring(left, left + 1).equals("$")){
-                if(move(down + 1, left)){
-                    return;}
-            }
-            if((mazeList.get(down).substring(left + 1, left + 2).equals(".")) || mazeList.get(down).substring(left + 1, left + 2).equals("$")){
-                if(move(down, left + 1)){
-                    return;}
-            }
-        }
-        //Right Row
-        else if( left == mazeList.get(down).length() - 1 && down > 0){
-            if((mazeList.get(down - 1).substring(left, left + 1).equals(".")) || mazeList.get(down - 1).substring(left, left + 1).equals("$")){
-                if(move(down - 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down + 1).substring(left, left + 1).equals(".")) || mazeList.get(down + 1).substring(left, left + 1).equals("$")){
-                if(move(down + 1, left)){
-                    return;}
-            }
-            if((mazeList.get(down).substring(left - 1, left).equals(".")) || mazeList.get(down).substring(left - 2, left - 1).equals("$")){
-                if(move(down, left - 1)){
-                    return;}
-            } 
-        }
-        //Everything in the middle
-        else{
-            if((mazeList.get(down - 1).substring(left, left + 1).equals(".")) || mazeList.get(down - 1).substring(left, left + 1).equals("$")){
-                if(move(down - 1, left)){
-                    return;}
-            } 
-            if((mazeList.get(down + 1).substring(left, left + 1).equals(".")) || mazeList.get(down + 1).substring(left, left + 1).equals("$")){
-                if(move(down + 1, left)){
-                    return;}
-            }
-            if((mazeList.get(down).substring(left - 1, left).equals(".")) || mazeList.get(down).substring(left - 1, left).equals("$")){
-                if(move(down, left - 1)){
-                    return;}
-            } 
-            if((mazeList.get(down).substring(left + 1, left + 2).equals(".")) || mazeList.get(down).substring(left + 1, left + 2).equals("$")){
-                if(move(down, left + 1)){
-                    return;}
-            }
-        }    
-    }
-    /**
-     * So the whole point of this method 
-     */
-    /**
-     * Scans the doc into an arraylist line by line (was about to do hasNext, but tom told me substring wont work)
-     */
-    public static void mazeArrayListScanner () {
-        try{
-            Scanner scan = new Scanner( new BufferedReader( new FileReader("maze.txt")));
-            while(scan.hasNextline()){
-                mazeList.add(scan.nextline());
-            }
+            //stores the xAxis number in array
+            String [] mazePositions = new String [xAxis];
             scan.close();
+            scan = new Scanner(new BufferedReader(new FileReader("maze.txt")));
+
+            //sets up counter
+            while (scan.hasNext()){
+                mazePositions [counter] = scan.nextLine();
+                counter++;
+            } 
+
+            for (i = 0; i < counter; i++){
+                store = mazePositions [i];
+
+                for (int x = 0; x < store.length(); x++){
+                    //looks for starting position
+                    if (store.substring(x,x+1).equals("@")){
+                        System.out.println("The yAxis is " + x + ", the xAxis is " + i);
+
+                        //pops starting position
+                        newx.pop();
+                        newy.pop();
+                        pushMeHarderJava(x,i);
+                    }
+                }
+            }
         }
-        catch(Exception e){
-            System.out.println(e);
-        }    
+        catch (Exception e) {
+            System.out.println("Exception" + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
+    //method used to push current position
+    public static void pushMeHarderJava(int a, int b) {
+        newx.push(new Node(a));                        
+        newy.push(new Node(b));
+
+        System.out.println(a + ", " + b);
+
+        up(a,b);
+        down(a,b);
+        left(a,b);
+        right(a,b);
+        done(a,b);
+    }
+
+    //method used to check for up possibility
+    public static void up(int newx1, int newy1) {
+
+        if (newy1 != 0){
+            store = mazePositions[newy1-1];          
+            if (store.substring(newx1,newx1+1).equals(".")){
+                pushMeHarderJava(newx1,newy1+1);
+            } else {
+                newx.pop();
+                newy.pop();
+                down(newx1,newy1);
+            }
+        } else  {
+            System.out.println("F"); 
+        }
+    }
+    //method used to check for down possibility
+    public static void down(int newx2, int newy2) {
+        if (newy2 < xAxis){
+            store = mazePositions[newy2+1];
+            if(store.substring(newx2,newx2+1).equals(".")){
+                pushMeHarderJava(newx2,newy2+1);
+            }  else {
+                newx.pop();
+                newy.pop();
+                left(newx2,newy2);
+            }
+        }
+    }
+
+    //method used to check for left possibility
+    public static void left(int newx3, int newy3) {
+        if (store.substring(newx3-1,newx3).equals(".")){
+            pushMeHarderJava(newx3-1,newy3);
+        }   else {
+            newx.pop();
+            newy.pop();
+            right(newx3,newy3);
+        }
+    }
+
+    //method used to check for right possibility
+    public static void right(int newx4, int newy4) {
+        if (store.substring(newx4+1,newx4).equals(".")){
+            pushMeHarderJava(newx4+1,newy4);
+        } else {
+            newx.pop();
+            newy.pop();
+            bossWeStuck(newx4,newy4);
+        }
+    }
+
     /**
-     * This handy dandy inner class is the brains of the array list manipulatior 
+     * This method is called, when a dead end is occuring 
      */
-    private class movementTings{ //private because i dont want it to be = to penis (thanks Kramer)
-        private int xLocation; //x axis of the location
-        private int yLocation; // y axis of the location
-        private movementTings(int yLocation, int xLocation){
-            yLocation = yLocation; 
-            xLocation = xLocation;
-        }
+    public static void bossWeStuck(int checkX, int checkY) {
+        boolean dejaVu = false;
+    }
+    //implement been there  
 
-        public int getYLocation(){
-            return yLocation;
-        }
-
-        public int getXLocation(){
-            return xLocation;
+    /**
+     * So we come here if we have a valid solution or not after checking all of the 4 directions if there is a valid move
+     * If we do, we call it a day and print it out
+     * Else, 
+     */
+    public static void done (int a, int b) {
+        if (store.substring(a,a+1).equals("$")){
+            while(newx.getNext() != null){
+                while (newy.getNext() != null){
+                    int store2 = newx.getValue();
+                    int store3 = newy.getValue();
+                    System.out.println(store2 + "," + store3);
+                    newx = newx.getNext();
+                    newy = newy.getNext();
+                }
+            }
+        } else{
+            System.out.println("This maze isnt solvable; Kramer WTF");
         }
     }
-
-   
 }
