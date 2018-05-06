@@ -1,0 +1,241 @@
+import java.util.*;
+
+/**
+ * @author Nitin Armstrong (The One and Only)
+ * @version 4.20
+ * The Canonical BST with a brand new balance and print function
+ */
+public class BST <T> {
+    private BSTNode <T> root;
+    private ArrayList<Row>  rows = new ArrayList<>();;
+
+    /**
+     * insert a single element into the tree. It is potentially possible to mess up the tree by modifying an element after insertion.
+     * @param in the element to insert (the actual instance is inserited, NOT A CLONE)
+     */
+    public void insert(T in) {
+        if (in == null) return;
+        BSTNode <T> bin = new BSTNode<T>();
+        bin.set(in);
+        if (root == null) {
+            root = bin;
+        } else {
+            insert_re(root, bin);
+        }
+    }
+
+    /**
+     * Method insert_re
+     *
+     * @param parent A parameter
+     * @param insertMe A parameter
+     */
+    private void insert_re(BSTNode parent, BSTNode insertMe) {
+        if (parent.getc().compareTo(insertMe.getc()) > 0) {
+            if (parent.getLeft() == null) {
+                parent.setLeft(insertMe);
+            } else {
+                insert_re(parent.getLeft(), insertMe);
+            }
+        } else {
+            if (parent.getRight() == null) {
+                parent.setRight(insertMe);
+            } else {
+                insert_re(parent.getRight(), insertMe);
+            }
+        }
+    }
+
+    /**
+     * Method inOrderPrint
+     *
+     */
+    public void inOrderPrint() {
+        if (root != null) {
+            inOrderPrint_re(root);
+        }
+    }
+
+    /**
+     * Method inOrderPrint_re
+     *
+     * @param parent A parameter
+     */
+    private void inOrderPrint_re(BSTNode<T> parent) {
+        if (parent == null) return;
+        inOrderPrint_re(parent.getLeft());
+        System.out.println(parent.getVal());
+        inOrderPrint_re(parent.getRight());
+    }
+
+    /**
+     * See if an element exists in the tree
+     * @param q element to search for in the tree
+     * @return true if an element in the tree is equal to the q, false otherwise
+     */
+    public boolean exists(T q) {
+        return exists_re(q,root);
+    }
+
+    /**
+     * Method exists_re
+     *
+     * @param q A parameter
+     * @param parent A parameter
+     * @return The return value
+     */
+    private boolean exists_re(T q, BSTNode<T> parent) {
+        if (parent == null) return false;
+        if (((Comparable)q).compareTo(parent.getc()) == 0) { //Typecasting shenanigans necessary for compareTo to work
+            return true;
+        } else if (((Comparable)q).compareTo(parent.getc()) < 0) {
+            return exists_re(q, parent.getLeft());
+        } else {
+            return exists_re(q, parent.getRight());
+        }
+    }
+
+    /**
+     * Method balance
+     *
+     */
+    void balance(){
+        if (root != null){
+            ArrayList<BSTNode<T>> treeList;
+            treeList = inOrderAdd(root);
+            if (treeList != null)
+                balance_re(treeList);
+        }
+
+    }
+
+    /**
+     * Method inOrderAdd
+     *
+     * @param parent A parameter 
+     * @return The return value
+     */
+    private ArrayList<BSTNode<T>> inOrderAdd(BSTNode<T> parent){
+        ArrayList<BSTNode<T>> treeList = new ArrayList<>();
+        if (parent == null) {
+            return null;
+        }
+        inOrderAdd(parent.getLeft());
+        treeList.add(parent);
+        inOrderAdd(parent.getRight());
+        return treeList;
+    }
+
+    /**
+     * Method balance_re
+     *
+     * @param treeList A parameter
+     */
+    private void balance_re(ArrayList<BSTNode<T>> treeList){
+        if (treeList.size() == 1){
+            return;
+        }
+        BSTNode<T> temp;
+        temp = treeList.get(treeList.size() / 2);
+        root = temp;
+        List<BSTNode<T>> lowerBound = treeList.subList(0,treeList.size()/2 -1);
+        List<BSTNode<T>> upperBound = treeList.subList(treeList.size()/2 + 1, treeList.size()); 
+        temp.setLeft(lowerBound);
+        temp.setRight(upperBound);
+        balance_re((ArrayList) treeList.subList(0, treeList.size()/ 2 -1));
+        balance_re((ArrayList) treeList.subList(treeList.size() / 2 + 1, treeList.size()));
+        
+    }
+
+    /**
+     * Method printTree
+     *
+     */
+    void printTree(){
+
+        print();
+
+        for(int x = 0; x < rows.size(); x++){
+            ArrayList<BSTNode> temp = rows.get(x).getNodeList();
+            for (int y = 0; y < temp.size(); y++){
+                System.out.print("row#" + x + " " + temp.get(y).getVal()+"\t");
+            }
+            System.out.println("");
+        }
+    }
+
+    /**
+     * Method print
+     *
+     */
+    private void print(){
+        ArrayList<BSTNode> tempList = new ArrayList<>();
+        Queue<BSTNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            while (!queue.isEmpty()) {
+                tempList.add(queue.poll());
+            }
+            ArrayList<BSTNode> temp = (ArrayList)tempList.clone();
+            rows.add(new Row(temp));
+            for (int x = 0; x < tempList.size(); x++) {
+                if (tempList.get(x).getLeft() != null) {
+                    queue.add(tempList.get(x).getLeft());
+                }
+                if (tempList.get(x).getRight() != null) {
+                    queue.add(tempList.get(x).getRight());
+                }
+            }
+            tempList.clear();
+        }
+    }
+
+    private class BSTNode <X>{
+        private X val;
+        private BSTNode left;
+        private BSTNode right;
+
+        BSTNode getLeft() {return left;}
+
+        BSTNode getRight() {return right;}
+
+        void setLeft(BSTNode bn) {left = bn;}
+
+        void setRight(BSTNode bn) {right = bn;}
+
+        X getVal() {return val;}
+
+        void set(X v) {val = v;}
+
+        Comparable getc() { return (Comparable) val;}
+    }
+    private class Row{
+        private ArrayList<BSTNode> nodeList;
+        /**
+         * Row Constructor
+         *
+         * @param nodeList A parameter
+         */
+        public Row(ArrayList  nodeLista){        
+            nodeList = nodeLista;
+        }
+
+        /**
+         * Method getNodeList
+         *
+         * @return The return value
+         */
+        public ArrayList<BSTNode> getNodeList() {
+            return nodeList;
+        }
+
+        /**
+         * Method setNodeList
+         *
+         * @param nodeList A parameter
+         */
+        public void setNodeList(ArrayList<BSTNode> nodeListb) {
+            nodeList = nodeListb;
+        }
+    }
+}
