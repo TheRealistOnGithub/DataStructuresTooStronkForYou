@@ -132,19 +132,20 @@ public class BST <T> {
      * @param treeList A parameter
      */
     private void balance_re(ArrayList<BSTNode<T>> treeList){
-        if (treeList.size() == 1){
-            return;
+        if (treeList.size() >= 1){
+            inOrderAdd(treeList.get(0));
+            
+        } else if (treeList.size() == 2) {
+            
+            inOrderAdd(treeList.get(0));
+            inOrderAdd(treeList.get(1));
+          
+        } else if (treeList.size() == 3) {
+            inOrderAdd(treeList.get(treeList.size()/2));
+            balance_re((ArrayList) treeList.subList(0, treeList.size()/ 2));
+            balance_re((ArrayList) treeList.subList(treeList.size() / 2 + 1, treeList.size()));
+
         }
-        BSTNode<T> temp;
-        temp = treeList.get(treeList.size() / 2);
-        root = temp;
-        List<BSTNode<T>> lowerBound = treeList.subList(0,treeList.size()/2 -1);
-        List<BSTNode<T>> upperBound = treeList.subList(treeList.size()/2 + 1, treeList.size()); 
-        temp.setLeft(lowerBound);
-        temp.setRight(upperBound);
-        balance_re((ArrayList) treeList.subList(0, treeList.size()/ 2 -1));
-        balance_re((ArrayList) treeList.subList(treeList.size() / 2 + 1, treeList.size()));
-        
     }
 
     /**
