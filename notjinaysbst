@@ -1,0 +1,195 @@
+import java.util.ArrayList;
+/*
+ * A generic BST class for creating a binary search tree
+ * @author Jinay Jain
+ */
+
+public class BST <T>
+{
+
+    BSTNode root;
+    /*
+     * Insert a node into the BST using comparisons
+     * @param insertMe the value of the node to insert
+     */
+    public void insert(T insertMe){
+        BSTNode<T> insert = new BSTNode<T>();
+        
+        insert.set(insertMe);
+        if(root == null){
+            root = insert;
+        } else {
+            BSTNode<T> curr = root;
+            while(curr.get() != null){
+                if(insert.getc().compareTo(curr.get()) < 0){
+                    if(curr.getLeft() == null){
+                        curr.setLeft(new BSTNode<T>());
+                    }
+                    curr = curr.getLeft();
+                    
+                } else {
+                    if(curr.getRight() == null){
+                        curr.setRight(new BSTNode<T>());
+                    }
+                    curr = curr.getRight();
+                    
+                }
+            }
+            curr.set(insertMe);
+        }
+        
+    }
+    
+    /*
+     * Calls the inOrderAL function to recursively print the tree in order
+     */
+    public void inOrderPrint(){
+        if(root != null){
+            ArrayList<BSTNode> ordered = inOrderAL(root);
+            for(BSTNode bn : ordered){
+                System.out.println(bn.get());
+            }
+        }
+    }
+    /*
+     * Uses a "root" bn node to recursively traverse the left and right trees, returning an ArrayList of the subtree in order
+     * @param bn The binary node that serves as the root of the subtree
+     * @return an ArrayList containing the subtree in order
+     */
+    public ArrayList<BSTNode> inOrderAL(BSTNode bn){
+        ArrayList<BSTNode> ret = new ArrayList<BSTNode>();
+        if(bn.getLeft() != null){
+            ret.addAll(inOrderAL(bn.getLeft()));
+        }
+        ret.add(bn);
+        if(bn.getRight() != null){
+            ret.addAll(inOrderAL(bn.getRight()));
+        }
+        return ret;
+    }
+    
+    /*
+     * Checks if some value exists in the BST
+     * @param checkMe the value that you would like to check
+     * @return a boolean saying whether or not the value is in the tree
+     */
+    public boolean exists(T checkMe){
+        BSTNode<T> check = new BSTNode<T>();
+        check.set(checkMe);
+        
+        BSTNode<T> curr = root;
+        
+        while(curr != null){
+            if(check.getc().compareTo(curr.get()) == 0){
+                return true;
+            } else if(check.getc().compareTo(curr.get()) < 0){
+                if(curr.getLeft() == null){
+                    return false;
+                } else {
+                    curr = curr.getLeft();
+                }
+            } else if(check.getc().compareTo(curr.get()) > 0){
+                if(curr.getRight() == null){
+                    return false;
+                } else {
+                    curr = curr.getRight();
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /*
+     * Prints the tree, level by level.
+     */
+    public void printTree(){
+        if(root != null){
+            ArrayList<BSTNode<T>> currLevel = new ArrayList<BSTNode<T>>();
+            ArrayList<BSTNode<T>> nextLevel = new ArrayList<BSTNode<T>>();
+            
+            currLevel.add(root);
+            
+            boolean addedVal = true;
+            
+            while(addedVal){
+                addedVal = false;
+                nextLevel = new ArrayList<BSTNode<T>>();
+                for(BSTNode<T> bn : currLevel){
+                    if(bn != null) {
+                        System.out.print(bn.get() + "\t");
+                        if(bn.getLeft() != null ) {
+                            addedVal = true;
+                            nextLevel.add(bn.getLeft());
+                        }
+                        else nextLevel.add(null);
+                        if(bn.getRight() != null ) {
+                            addedVal = true;
+                            nextLevel.add(bn.getRight());  
+                        }
+                        else nextLevel.add(null);
+                    }
+                    else {
+                        System.out.print("\t");
+                        nextLevel.add(null);
+                        nextLevel.add(null);
+                    }
+                    
+                }
+                System.out.print("\n");
+                currLevel = nextLevel;
+            }
+            
+        }
+    }
+    
+    /*
+     * Uses the recursive function balanceTree to balance the BST
+     */
+    public void balance(){
+        if(root != null) root = balanceTree(inOrderAL(root));
+    }
+    
+    /*
+     * Method used to balance the binary search tree given some ArrayList in order. Recursively calls itself to generate the subtrees and puts them back together
+     * @param inOrder an ArrayList of the BST in order of value
+     * @return a BST "root" node that contains the root of the subtree made from inOrder.
+     */
+    public BSTNode<T> balanceTree(ArrayList<BSTNode> inOrder){
+        if(inOrder.size() == 0) return null;
+        BSTNode ret = inOrder.get(inOrder.size() / 2);
+        ArrayList<BSTNode> leftSide = new ArrayList<BSTNode>(inOrder.subList(0, inOrder.size() / 2));
+        ArrayList<BSTNode> rightSide = new ArrayList<BSTNode>(inOrder.subList((inOrder.size() / 2) + 1, inOrder.size()));
+        
+        ret.setLeft(balanceTree(leftSide));
+        ret.setRight(balanceTree(rightSide));
+        
+        return ret;
+    }
+    
+    public class BSTNode <X>
+    {
+        X val;
+        BSTNode left;
+        BSTNode right;
+    
+        BSTNode getLeft() {return left;}
+    
+        BSTNode getRight() {return right;}
+        
+        void setLeft(BSTNode bn) {left = bn;}
+    
+        void setRight(BSTNode bn) {right = bn;}
+        
+        X get() {return val;}
+    
+        void set(X v) {val = v;}
+    
+        //need a version of get that returns a comparable object,
+        //because compareTo won't work on generic types by default
+        //use get when you need to access the value, use getc
+        //when you need to do a comparison
+        //This will crash if a non-comparable object is used.
+        Comparable getc() {return (Comparable) val;}
+    }
+}
